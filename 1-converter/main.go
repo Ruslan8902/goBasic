@@ -15,5 +15,5 @@ func getUserInput() string {
 }
 
 func covertCurrensies(n float64, currency1 string, currency2 string) float64 {
-
+	return 1
 }
