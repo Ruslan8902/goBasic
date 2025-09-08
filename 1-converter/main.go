@@ -5,16 +5,19 @@ import (
 )
 
 const (
-	EUR      = "EUR"
-	RUB      = "RUB"
-	USD      = "USD"
-	usdToEur = 0.8532
-	usdToRub = 81.56
-	eurToRub = 95.48
-	eurToUsd = 1.17
-	rubToUsd = 0.012262
-	rubToEur = 0.010473
+	EUR = "EUR"
+	RUB = "RUB"
+	USD = "USD"
 )
+
+var currencyRates = map[string]float64{
+	"USDtoEUR": 0.8532,
+	"USDtoRUB": 81.56,
+	"EURtoRUB": 95.48,
+	"EURtoUSD": 1.17,
+	"RUBtoUSD": 0.012262,
+	"RUBtoEUR": 0.010473,
+}
 
 func main() {
 	source := getSourceCurrency()
@@ -90,20 +93,6 @@ func getMoneyQuantity() float64 {
 }
 
 func covertCurrensies(n float64, source string, target string) float64 {
-	var res float64
-	switch {
-	case source == EUR && target == USD:
-		res = n * eurToUsd
-	case source == EUR && target == RUB:
-		res = n * eurToRub
-	case source == USD && target == EUR:
-		res = n * usdToEur
-	case source == USD && target == RUB:
-		res = n * usdToRub
-	case source == RUB && target == USD:
-		res = n * rubToUsd
-	case source == RUB && target == EUR:
-		res = n * rubToEur
-	}
-	return res
+	var currencyRatesKey = source + "to" + target
+	return n * currencyRates[currencyRatesKey]
 }
