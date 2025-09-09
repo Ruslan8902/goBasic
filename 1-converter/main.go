@@ -17,22 +17,22 @@ func main() {
 		"RUBtoUSD": 0.012262,
 		"RUBtoEUR": 0.010473,
 	}
-	source := getSourceCurrency(currencies)
-	target := getTargetCurrency(source, currencies)
+	source := getSourceCurrency(&currencies)
+	target := getTargetCurrency(source, &currencies)
 	q := getMoneyQuantity()
-	result := covertCurrensies(q, source, target, currencyRates)
+	result := covertCurrensies(q, source, target, &currencyRates)
 	fmt.Printf("%.2f", result)
 
 }
 
-func getSourceCurrency(currencies []string) string {
+func getSourceCurrency(currencies *[]string) string {
 	var input string
 	for {
 		fmt.Println("Введите код валюты, из которой необходимо перевести деньги.")
 		fmt.Println("Доступные валюты: EUR, USD, RUB")
 		fmt.Scan(&input)
 
-		if !slices.Contains(currencies, input) {
+		if !slices.Contains(*currencies, input) {
 			continue
 		} else {
 			break
@@ -42,11 +42,11 @@ func getSourceCurrency(currencies []string) string {
 
 }
 
-func getTargetCurrency(source string, currencies []string) string {
+func getTargetCurrency(source string, currencies *[]string) string {
 	var input string
 	var availableCurrencies []string
 
-	for _, curr := range currencies {
+	for _, curr := range *currencies {
 		if curr != source {
 			availableCurrencies = append(availableCurrencies, curr)
 		}
@@ -82,7 +82,7 @@ func getMoneyQuantity() float64 {
 	return input
 }
 
-func covertCurrensies(n float64, source string, target string, currencyRates map[string]float64) float64 {
+func covertCurrensies(n float64, source string, target string, currencyRates *map[string]float64) float64 {
 	var currencyRatesKey = source + "to" + target
-	return n * currencyRates[currencyRatesKey]
+	return n * (*currencyRates)[currencyRatesKey]
 }
