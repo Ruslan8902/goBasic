@@ -3,23 +3,23 @@ package bins
 import "time"
 
 type Bin struct {
-	id        string
-	private   bool
-	createdAt time.Time
-	name      string
+	Id        string    `json:"id"`
+	Private   bool      `json:"private"`
+	CreatedAt time.Time `json:"createdAt"`
+	Name      string    `json:"name"`
 }
 
 func NewBin(id string, private bool, createdAt time.Time, name string) *Bin {
 	return &Bin{
-		id:        id,
-		private:   private,
-		createdAt: createdAt,
-		name:      name,
+		Id:        id,
+		Private:   private,
+		CreatedAt: createdAt,
+		Name:      name,
 	}
 }
 
 type BinList struct {
-	bins []Bin
+	Bins []Bin `json:"bins"`
 }
 
 func NewBinList(arr ...Bin) *BinList {
@@ -27,6 +27,6 @@ func NewBinList(arr ...Bin) *BinList {
 	binArr = append(binArr, arr...)
 
 	return &BinList{
-		bins: binArr,
+		Bins: binArr,
 	}
 }
