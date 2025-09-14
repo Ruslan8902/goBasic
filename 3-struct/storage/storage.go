@@ -6,10 +6,6 @@ import (
 	"os"
 )
 
-type Db interface {
-	WriteStorage([]byte)
-	ReadStorage() ([]byte, error)
-}
 type Storage struct {
 	path string
 }
