@@ -44,8 +44,6 @@ func NewBinListWithDb(db Db) *BinListWithDb {
 		binArr.Bins = []Bin{}
 	}
 
-	binArr.Bins = append(binArr.Bins, arr...)
-
 	return &BinListWithDb{
 		BinList: BinList{
 			Bins: binArr.Bins,
