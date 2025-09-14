@@ -1,10 +1,13 @@
 package bins
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Db interface {
-	WriteStorage(content []byte, storage string)
-	ReadStorage(storage string) BinList
+	WriteStorage([]byte)
+	ReadStorage() ([]byte, error)
 }
 
 type Bin struct {
@@ -32,8 +35,15 @@ type BinListWithDb struct {
 	db Db
 }
 
-func NewBinList(db Db, storage string, arr ...Bin) *BinListWithDb {
-	binArr := db.ReadStorage(storage)
+func NewBinListWithDb(db Db) *BinListWithDb {
+	binArrBytes, _ := db.ReadStorage()
+
+	var binArr BinList
+	err := json.Unmarshal(binArrBytes, &binArr)
+	if err != nil {
+		binArr.Bins = []Bin{}
+	}
+
 	binArr.Bins = append(binArr.Bins, arr...)
 
 	return &BinListWithDb{
