@@ -2,6 +2,11 @@ package bins
 
 import "time"
 
+type Db interface {
+	WriteStorage(content []byte, storage string)
+	ReadStorage(storage string) BinList
+}
+
 type Bin struct {
 	Id        string    `json:"id"`
 	Private   bool      `json:"private"`
@@ -22,11 +27,19 @@ type BinList struct {
 	Bins []Bin `json:"bins"`
 }
 
-func NewBinList(arr ...Bin) *BinList {
-	var binArr []Bin
-	binArr = append(binArr, arr...)
+type BinListWithDb struct {
+	BinList
+	db Db
+}
 
-	return &BinList{
-		Bins: binArr,
+func NewBinList(db Db, storage string, arr ...Bin) *BinListWithDb {
+	binArr := db.ReadStorage(storage)
+	binArr.Bins = append(binArr.Bins, arr...)
+
+	return &BinListWithDb{
+		BinList: BinList{
+			Bins: binArr.Bins,
+		},
+		db: db,
 	}
 }
