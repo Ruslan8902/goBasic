@@ -1,10 +1,10 @@
 package api
 
 import (
+	"fmt"
 	"gobasics/config"
 )
 
 func APIfunction(c *config.Config) {
-	// configStuct := config.NewConfig()
-	// fmt.Println(configStuct)
+	fmt.Println(c)
 }
