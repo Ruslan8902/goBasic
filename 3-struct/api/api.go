@@ -5,6 +5,6 @@ import (
 	"gobasics/config"
 )
 
-func APIfunction(c *config.Config) {
+func GetBin(c *config.Config) {
 	fmt.Println(c)
 }
