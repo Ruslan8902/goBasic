@@ -7,18 +7,17 @@ import (
 	"strings"
 )
 
+var funcs = map[string]func([]int) float64{
+	"AVG": getAVG,
+	"SUM": getSum,
+	"MED": getMedian,
+}
+
 func main() {
 	operation := getUserOperation()
 	numbers := getUserNumbers()
-
-	switch operation {
-	case "AVG":
-		fmt.Printf("%.2f", getAVG(numbers))
-	case "SUM":
-		fmt.Println(getSum(numbers))
-	case "MED":
-		fmt.Println(getMedian(numbers))
-	}
+	result := funcs[operation](numbers)
+	fmt.Printf("%.2f", result)
 }
 
 func getUserNumbers() []int {
@@ -64,19 +63,20 @@ func getAVG(nums []int) float64 {
 	return float64(getSum(nums)) / float64(len(nums))
 }
 
-func getSum(nums []int) int {
+func getSum(nums []int) float64 {
 	total := 0
 	for _, val := range nums {
 		total += val
 	}
-	return total
+	return float64(total)
 }
 
-func getMedian(nums []int) int {
+func getMedian(nums []int) float64 {
 	if len(nums) == 0 {
 		return 0
 	}
-	var median, center int
+	var center int
+	var median float64
 
 	slices.SortFunc(nums, func(a, b int) int {
 		if a > b {
@@ -90,9 +90,9 @@ func getMedian(nums []int) int {
 
 	if len(nums)%2 == 0 {
 		center = len(nums) / 2
-		median = (nums[center] + nums[center-1]) / 2
+		median = float64((nums[center] + nums[center-1])) / 2
 	} else {
-		median = nums[len(nums)/2]
+		median = float64(nums[len(nums)/2])
 	}
 
 	return median

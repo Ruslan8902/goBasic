@@ -1,15 +1,23 @@
 package storage
 
 import (
-	"encoding/json"
 	"fmt"
-	"gobasics/bins"
 	"gobasics/file"
 	"os"
 )
 
-func WriteStorage(content []byte, storage string) {
-	file, err := os.Create(storage)
+type Storage struct {
+	path string
+}
+
+func NewStorage(path string) *Storage {
+	return &Storage{
+		path: path,
+	}
+}
+
+func (s *Storage) WriteStorage(content []byte) {
+	file, err := os.Create(s.path)
 
 	if err != nil {
 		fmt.Println(err)
@@ -25,38 +33,30 @@ func WriteStorage(content []byte, storage string) {
 	fmt.Println("Запись прошла успешно!")
 }
 
-func ReadStorage(storage string) bins.BinList {
-	if file.IsJson(storage) {
-		file, err := os.ReadFile(storage)
+func (s *Storage) ReadStorage() ([]byte, error) {
+	if file.IsJson(s.path) {
+		file, err := os.ReadFile(s.path)
 		if err != nil {
 			fmt.Println(err)
-			return bins.BinList{}
+			return []byte{}, err
 		}
-
-		var arr bins.BinList
-		err = json.Unmarshal(file, &arr)
-		if err != nil {
-			fmt.Println(err)
-			return bins.BinList{}
-		}
-
-		return arr
+		return file, nil
 	}
-	return bins.BinList{}
+	return []byte{}, nil
 }
 
-func SaveBinListJSON(binList *bins.BinList) {
-	binsBytes, err := ToBytes(binList)
-	if err != nil {
-		fmt.Println(err)
+func (s *Storage) SaveBinListJSON(binList *[]byte) {
+	if file.IsJson(s.path) {
+		s.WriteStorage(*binList)
+	} else {
+		fmt.Print("Not JSON storage")
 	}
-	WriteStorage(binsBytes, "bins.json")
 }
 
-func ToBytes(binList *bins.BinList) ([]byte, error) {
-	file, err := json.Marshal(binList)
-	if err != nil {
-		return nil, err
-	}
-	return file, nil
-}
+// func ToBytes(binList *bins.BinList) ([]byte, error) {
+// 	file, err := json.Marshal(binList)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return file, nil
+// }
