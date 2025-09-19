@@ -22,22 +22,22 @@ type RespStruct struct {
 	} `json:"metadata"`
 }
 
-func CreateBin(c *config.Config, binListWithDb *bins.BinListWithDb, filePath *string, name *string) error {
+func CreateBin(c *config.Config, binListWithDb *bins.BinListWithDb, filePath *string, name *string) ([]byte, error) {
 	if !file.IsJson(*filePath) {
-		return errors.New("not json file")
+		return []byte{}, errors.New("not json file")
 	}
 
 	fileBody, err := file.ReadSomeFile(*filePath)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return []byte{}, err
 	}
 
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodPost, c.BaseUrl, bytes.NewBuffer(fileBody))
 	if err != nil {
 		fmt.Println("Ошибка создания запроса:", err)
-		return err
+		return []byte{}, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -46,14 +46,14 @@ func CreateBin(c *config.Config, binListWithDb *bins.BinListWithDb, filePath *st
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Ошибка отправки запроса:", err)
-		return err
+		return []byte{}, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Ошибка чтения ответа:", err)
-		return err
+		return []byte{}, err
 	}
 
 	var respJson RespStruct
@@ -65,16 +65,16 @@ func CreateBin(c *config.Config, binListWithDb *bins.BinListWithDb, filePath *st
 
 	binListWithDb.Db.WriteStorage(content)
 	fmt.Println("Ответ сервера:", string(body))
-	return nil
+	return body, nil
 }
 
-func GetBin(c *config.Config, id *string) (string, error) {
+func GetBin(c *config.Config, id *string) ([]byte, error) {
 	url := c.BaseUrl + "/" + *id
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		fmt.Println("Ошибка создания запроса:", err)
-		return "", err
+		return []byte{}, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -83,25 +83,25 @@ func GetBin(c *config.Config, id *string) (string, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Ошибка отправки запроса:", err)
-		return "", err
+		return []byte{}, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Ошибка чтения ответа:", err)
-		return "", err
+		return []byte{}, err
 	}
-	return string(body), nil
+	return body, nil
 }
 
-func DeleteBin(c *config.Config, binListWithDb *bins.BinListWithDb, id *string) (string, error) {
+func DeleteBin(c *config.Config, binListWithDb *bins.BinListWithDb, id *string) ([]byte, error) {
 	url := c.BaseUrl + "/" + *id
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodDelete, url, nil)
 	if err != nil {
 		fmt.Println("Ошибка создания запроса:", err)
-		return "", err
+		return []byte{}, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -110,14 +110,14 @@ func DeleteBin(c *config.Config, binListWithDb *bins.BinListWithDb, id *string) 
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Ошибка отправки запроса:", err)
-		return "", err
+		return []byte{}, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Ошибка чтения ответа:", err)
-		return "", err
+		return []byte{}, err
 	}
 
 	idx := slices.IndexFunc(binListWithDb.Bins, func(b bins.Bin) bool { return b.Id == *id })
@@ -125,18 +125,18 @@ func DeleteBin(c *config.Config, binListWithDb *bins.BinListWithDb, id *string) 
 	content, _ := json.Marshal(binListWithDb.BinList.Bins)
 	binListWithDb.Db.WriteStorage(content)
 
-	return fmt.Sprintf("Bin with id=%v is deleted. %v", id, body), nil
+	return body, nil
 }
 
-func UpdateBin(c *config.Config, binListWithDb *bins.BinListWithDb, id *string, filePath *string) (string, error) {
+func UpdateBin(c *config.Config, binListWithDb *bins.BinListWithDb, id *string, filePath *string) ([]byte, error) {
 	if !file.IsJson(*filePath) {
-		return "", errors.New("not json file")
+		return []byte{}, errors.New("not json file")
 	}
 
 	fileBody, err := file.ReadSomeFile(*filePath)
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return []byte{}, err
 	}
 
 	url := c.BaseUrl + "/" + *id
@@ -144,7 +144,7 @@ func UpdateBin(c *config.Config, binListWithDb *bins.BinListWithDb, id *string, 
 	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(fileBody))
 	if err != nil {
 		fmt.Println("Ошибка создания запроса:", err)
-		return "", err
+		return []byte{}, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -153,14 +153,14 @@ func UpdateBin(c *config.Config, binListWithDb *bins.BinListWithDb, id *string, 
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Ошибка отправки запроса:", err)
-		return "", err
+		return []byte{}, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Ошибка чтения ответа:", err)
-		return "", err
+		return []byte{}, err
 	}
 
 	idx := slices.IndexFunc(binListWithDb.Bins, func(b bins.Bin) bool { return b.Id == *id })
@@ -168,5 +168,5 @@ func UpdateBin(c *config.Config, binListWithDb *bins.BinListWithDb, id *string, 
 	content, _ := json.Marshal(binListWithDb.BinList.Bins)
 	binListWithDb.Db.WriteStorage(content)
 
-	return fmt.Sprintf("Bin with id=%v is updated. %v", *id, string(body)), nil
+	return body, nil
 }

@@ -29,7 +29,8 @@ func main() {
 
 	if *createFlag {
 		fmt.Print("create", *fileFlag, *nameFlag)
-		err := api.CreateBin(configStuct, binListWithDb, fileFlag, nameFlag)
+		resp, err := api.CreateBin(configStuct, binListWithDb, fileFlag, nameFlag)
+		fmt.Println(resp)
 		if err != nil {
 			fmt.Print(err)
 		}
@@ -40,14 +41,14 @@ func main() {
 		if err != nil {
 			fmt.Print(err)
 		}
-		fmt.Println(respBody)
+		fmt.Println(string(respBody))
 	}
 	if *deleteFlag {
 		respBody, err := api.DeleteBin(configStuct, binListWithDb, idFlag)
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println(respBody)
+		fmt.Println(string(respBody))
 	}
 	if *getFlag {
 		fmt.Println("get", *idFlag)
