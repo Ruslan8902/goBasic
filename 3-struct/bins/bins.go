@@ -2,6 +2,7 @@ package bins
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -27,27 +28,38 @@ func NewBin(id string, private bool, createdAt time.Time, name string) *Bin {
 }
 
 type BinList struct {
-	Bins []Bin `json:"bins"`
+	Bins []Bin
 }
 
 type BinListWithDb struct {
 	BinList
-	db Db
+	Db Db
 }
 
 func NewBinListWithDb(db Db) *BinListWithDb {
 	binArrBytes, _ := db.ReadStorage()
 
-	var binArr BinList
+	var binArr []Bin
 	err := json.Unmarshal(binArrBytes, &binArr)
 	if err != nil {
-		binArr.Bins = []Bin{}
+		return &BinListWithDb{
+			BinList: BinList{
+				Bins: []Bin{},
+			},
+			Db: db,
+		}
 	}
 
 	return &BinListWithDb{
 		BinList: BinList{
-			Bins: binArr.Bins,
+			Bins: binArr,
 		},
-		db: db,
+		Db: db,
+	}
+}
+
+func (b *BinListWithDb) PrintBinList() {
+	for i, bin := range b.Bins {
+		fmt.Printf("%v. %v: %v\n", i+1, bin.Id, bin.Name)
 	}
 }

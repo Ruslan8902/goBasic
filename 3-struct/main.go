@@ -24,25 +24,43 @@ func main() {
 
 	flag.Parse()
 
+	db := storage.NewStorage("bins.json")
+	binListWithDb := bins.NewBinListWithDb(db)
+
 	if *createFlag {
 		fmt.Print("create", *fileFlag, *nameFlag)
-
+		resp, err := api.CreateBin(configStuct, binListWithDb, fileFlag, nameFlag)
+		fmt.Println(resp)
+		if err != nil {
+			fmt.Print(err)
+		}
 	}
 	if *updateFlag {
-		fmt.Print("update", *fileFlag, *idFlag)
+		fmt.Println("update", *fileFlag, *idFlag)
+		respBody, err := api.UpdateBin(configStuct, binListWithDb, idFlag, fileFlag)
+		if err != nil {
+			fmt.Print(err)
+		}
+		fmt.Println(string(respBody))
 	}
 	if *deleteFlag {
-		fmt.Print("delete", *idFlag)
+		respBody, err := api.DeleteBin(configStuct, binListWithDb, idFlag)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(string(respBody))
 	}
 	if *getFlag {
-		fmt.Print("get", *idFlag)
-	}
-	if *listFlag {
-		fmt.Print("list")
+		fmt.Println("get", *idFlag)
+		respBody, err := api.GetBin(configStuct, idFlag)
+		if err != nil {
+			fmt.Print(err)
+		}
+		fmt.Println(respBody)
 	}
 
-	api.GetBin(configStuct)
-	db := storage.NewStorage("bins.json")
-	binList := bins.NewBinListWithDb(db)
-	fmt.Print(binList)
+	if *listFlag {
+		fmt.Println("list")
+		binListWithDb.PrintBinList()
+	}
 }
